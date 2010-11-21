@@ -1,0 +1,5 @@
+Manifest-version: 1.0
+Name: org/ygsoft/webserver/ex
+Main-Class: org.ygsoft.webserver.ui.GUIMain
+Sealed: true
+Class-Path: org.ygsoft.webserver.core_20100102.jar
