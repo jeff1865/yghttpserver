@@ -18,9 +18,9 @@ public class Exam extends Gdplet {
 			// write HttpHeader
 			res.writeStringToHeader();	
 			
-			String contBody = "<html><head><title>Exam Title</title></head><body bgcolor=#" 
+			String contBody = "<html><head><title>GDP Title</title></head><body bgcolor=#" 
 				+ (System.currentTimeMillis()+"").substring((System.currentTimeMillis()+"").length()-6)
-				+">Hello Exam .. "
+				+">Hello GDP .. "
 				+ new Date(System.currentTimeMillis()) + "</body></html>";
 			
 			// write HttpBody
