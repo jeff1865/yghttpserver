@@ -27,7 +27,7 @@ public class ServiceMapper {
 	}
 	
 	public AbstractService getServiceContainer(Socket socket){
-		XRequest req = parseRequest(socket);
+		XRequest req = this.parseRequest(socket);
 		if(req != null) {
 			PLogging.printv(PLogging.DEBUG, "[Cliet->Server]" + req.toString());
 			ResourceDescription rd = req.getParsedMainHeader();
@@ -81,7 +81,7 @@ public class ServiceMapper {
 		System.out.println(res.substring(res.lastIndexOf(".")));
 	}
 	
-	private static XRequest parseRequest(Socket socket) {
+	private XRequest parseRequest(Socket socket) {
 		XRequest request = null;
 		if(socket == null){
 			PLogging.printv(PLogging.DEBUG, "[IPC] Invalid state, socket is null ..");
@@ -89,22 +89,37 @@ public class ServiceMapper {
 			try {
 				InputStream is = socket.getInputStream();
 				BufferedReader br = new BufferedReader(new InputStreamReader(is));
-				
+				//--- TEST ---
+//				char[] buf = new char[5];
+//				br.read(buf,0,5);
+				//--- TEST ---
 				String line = br.readLine();
-				if(line != null)
-				{
+//				System.out.println("------------->" + new String(buf));
+//				line = new String(buf) + line;
+				if(line != null) {
+					System.out.println(">>>" + line);
 					line = URLDecoder.decode(line, "UTF-8");
 					request = new XRequest(line);
+				} else {
+					PLogging.printv(PLogging.DEBUG, "Invalid Request : Request Line is NULL..");
+					throw new Exception("Invalid HTTP Request ..");
 				}
 				
 				while((line = br.readLine()).length() > 0){
 					request.addHeaderOption(line);
 				}
 				
-			} catch (IOException e) {
+			} catch (Exception e) {
+				System.out.println("!!!!PROBLEM!!!!");
 				e.printStackTrace();
 				request = null;
-			}
+				try {
+					socket.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+				return null;
+			} 
 		}
 		return request;
 	}

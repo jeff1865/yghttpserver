@@ -16,6 +16,8 @@ public class MicroWebServer extends Observable{
 	private ServiceMapper controller = null;
 	private IServiceScheduler ss = null;
 	
+	private long connCount = 0;
+	
 	public MicroWebServer(int port, ServiceMapper controller, IServiceScheduler sScheduler) {
 		PORT = port;
 		this.controller = controller;
@@ -35,7 +37,7 @@ public class MicroWebServer extends Observable{
 			while(this.started){
 				PLogging.printv(PLogging.DEBUG, "Waiting connection ..");
 				Socket socket = this.sSocket.accept();
-				PLogging.printv(PLogging.DEBUG, "Client socket connected ..");
+				PLogging.printv(PLogging.DEBUG, "Client socket connected : " + this.connCount++);
 				this.procClient(socket);
 			}
 			
@@ -66,11 +68,15 @@ public class MicroWebServer extends Observable{
 	private void procClient(Socket sock){
 		// need to be controlled by front Controller
 		AbstractService srvCont = this.controller.getServiceContainer(sock);
-		
+		if(srvCont == null){
+			PLogging.printv(PLogging.INFO, "Invalid Request !!");
+			return ;
+		}
 //		// processing connection by creating new Thread
 //		new Thread(srvCont).start();
 		
 		// processing connection by using ThreadPool
+		
 		this.ss.executeService(srvCont);
 	}
 }

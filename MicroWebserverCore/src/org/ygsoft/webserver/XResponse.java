@@ -14,7 +14,7 @@ public class XResponse {
 	}
 	
 	public void writeStringToBody(String body) throws IOException{
-		this.os.write(body.getBytes(), 0, body.length());
+		this.os.write(body.getBytes("utf-8"), 0, body.getBytes("utf-8").length);
 		this.os.flush();
 	}
 	
