@@ -21,6 +21,9 @@ public class ServiceScheduler extends ThreadPoolExecutor implements IServiceSche
 	public void executeService(AbstractService service) {
 		PLogging.printv(PLogging.DEBUG, "[Request] Service(id:" + service.getServiceID() + ") was scheduled ..");
 		super.execute(service);
+		
+		PLogging.printv(PLogging.DEBUG, "Active Con :" + this.getActiveCount() 
+				+ " Scheduled :" + this.getScheduledServiceCount() + " Completed :" + this.getCompletedServiceCount());
 	}
 		
 	@Override

@@ -2,7 +2,7 @@ package org.ygsoft.webserver;
 
 import java.util.Hashtable;
 
-public class ServiceManager<T> {
+public class ServiceManager<T extends IServicelet> {
 	private Hashtable<String, T> th_serRepository = null;
 	
 	public ServiceManager(){
@@ -10,8 +10,13 @@ public class ServiceManager<T> {
 	}
 	
 	public void addService(T t){
-		PLogging.printv(PLogging.DEBUG, "Register Service>" + t.getClass().getSimpleName());
-		this.th_serRepository.put(t.getClass().getSimpleName(), t);
+		// old
+//		PLogging.printv(PLogging.DEBUG, "Register Service>" + t.getClass().getSimpleName());
+//		this.th_serRepository.put(t.getClass().getSimpleName(), t);
+		
+		// new
+		PLogging.printv(PLogging.DEBUG, "Register ServiceLet>" + t.getID());
+		this.th_serRepository.put(t.getID(), t);
 	}
 	
 	public T getService(String serId){
