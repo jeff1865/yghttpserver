@@ -53,9 +53,12 @@ public class StaticResourceService extends AbstractService{
 				
 				try {
 					OutputStream os = this.response.getOutputStream();
+					System.out.println("Write Service ID:" + this.getServiceID());
 					// write header
 					os.write(header.getBytes());
+					os.flush();
 					// write body
+					PLogging.printv(PLogging.DEBUG, "Send Data Body ..");
 					InputStream is = new FileInputStream(resFile);
 					byte[] buf = new byte[bufSize];
 					int c = 0;
@@ -77,6 +80,12 @@ public class StaticResourceService extends AbstractService{
 				}
 			}
 		}
+	}
+
+	@Override
+	public AbstractService getNewObject() {
+		// TODO Auto-generated method stub
+		return new StaticResourceService(resRoot);
 	}
 	
 }

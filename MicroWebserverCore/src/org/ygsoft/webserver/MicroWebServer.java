@@ -6,9 +6,10 @@ import java.util.Observable;
 /**
  * Thread based web server
  */
-public class MicroWebServer extends Observable{
+public class MicroWebServer extends Observable {
 		
 	private static int PORT = 2012;
+	public static int DefaultKeepAliveTime = 15 * 1000;
 	
 	private volatile boolean started = false;
 	private ServerSocket sSocket = null;
@@ -17,13 +18,14 @@ public class MicroWebServer extends Observable{
 	private IServiceScheduler ss = null;
 	
 	private long connCount = 0;
+	private ClientSocketQueue sockQueue = null;
 	
 	public MicroWebServer(int port, ServiceMapper controller, IServiceScheduler sScheduler) {
 		PORT = port;
 		this.controller = controller;
 		this.ss = sScheduler;
 	}
-	
+		
 	public IServiceScheduler getScheduler(){
 		return this.ss;
 	}
@@ -38,7 +40,8 @@ public class MicroWebServer extends Observable{
 				PLogging.printv(PLogging.DEBUG, "Waiting connection ..");
 				Socket socket = this.sSocket.accept();
 				PLogging.printv(PLogging.DEBUG, "Client socket connected : " + this.connCount++);
-				this.procClient(socket);
+				this.sockQueue.addSocket(socket);
+				//this.procClient(socket);
 			}
 			
 		} catch (IOException e) {
@@ -47,6 +50,10 @@ public class MicroWebServer extends Observable{
 	}
 	
 	public void startServer() {
+		this.sockQueue = new ClientSocketQueue(this);
+		this.sockQueue.startQueue();
+		this.controller.setSocketQueue(this.sockQueue);
+		
 		this.started = true;
 		this.serverSocketInit();
 	}
@@ -65,18 +72,29 @@ public class MicroWebServer extends Observable{
 		}
 	}
 	
-	private void procClient(Socket sock){
-		// need to be controlled by front Controller
-		AbstractService srvCont = this.controller.getServiceContainer(sock);
-		if(srvCont == null){
-			PLogging.printv(PLogging.INFO, "Invalid Request !!");
-			return ;
-		}
-//		// processing connection by creating new Thread
-//		new Thread(srvCont).start();
+	protected void procClient(final Socket sock){
 		
-		// processing connection by using ThreadPool
-		
-		this.ss.executeService(srvCont);
+		new Thread() { public void run(){
+			try {
+				sock.setSoTimeout(DefaultKeepAliveTime);
+			} catch (SocketException e) {
+				e.printStackTrace();
+				return ;
+			}
+			// need to be controlled by front Controller
+			//TODO need to be processed by Thread 
+			AbstractService srvCont = controller.getServiceContainer(sock);
+			if(srvCont == null){
+				PLogging.printv(PLogging.INFO, "Invalid Request !!");
+				return ;
+			}
+	//		// processing connection by creating new Thread
+	//		new Thread(srvCont).start();
+			
+			// processing connection by using ThreadPool
+			ss.executeService(srvCont);
+		}}.start();
 	}
+
+	
 }

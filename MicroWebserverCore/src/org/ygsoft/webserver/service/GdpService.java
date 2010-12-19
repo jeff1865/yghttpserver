@@ -99,4 +99,10 @@ public class GdpService extends AbstractService {
 			}
 		}
 	}
+
+	@Override
+	public AbstractService getNewObject() {
+		// TODO Auto-generated method stub
+		return new GdpService(this.sMng);
+	}
 }

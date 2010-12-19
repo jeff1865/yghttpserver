@@ -10,9 +10,14 @@ import java.util.*;
 
 public class ServiceMapper {
 	private Hashtable<String, AbstractService> htContainer = null;
+	private ClientSocketQueue sockQueue = null;
 	
 	public ServiceMapper(){
 		;
+	}
+	
+	public void setSocketQueue(ClientSocketQueue queue){
+		this.sockQueue = queue;
 	}
 	
 	public void addContainer(AbstractService cont){
@@ -47,7 +52,7 @@ public class ServiceMapper {
 				AbstractService mCont = this.getMatchedContainer(rd.getResName());
 				if(mCont != null)
 				{
-					mCont.setSocket(socket);
+					mCont.setSocket(socket, this.sockQueue);
 					XResponse res = null;
 					try {
 						res = ProtocolHelper.getDefaultXResponse(new XResponse(socket.getOutputStream()));
@@ -70,10 +75,10 @@ public class ServiceMapper {
 		{
 			String strExt = strRes.substring(strRes.lastIndexOf(".") + 1);
 			if(strExt != null && this.htContainer.containsKey(strExt)){
-				return this.htContainer.get(strExt);
+				return this.htContainer.get(strExt).getNewObject();
 			}
 		}
-		return this.htContainer.get("*");
+		return this.htContainer.get("*").getNewObject();
 	}
 	
 	public static void main(String...v){
@@ -90,22 +95,24 @@ public class ServiceMapper {
 				InputStream is = socket.getInputStream();
 				BufferedReader br = new BufferedReader(new InputStreamReader(is));
 				//--- TEST ---
-//				char[] buf = new char[5];
-//				br.read(buf,0,5);
+//				char[] buf = new char[3];
+//				br.read(buf,0,3);
 				//--- TEST ---
 				String line = br.readLine();
 //				System.out.println("------------->" + new String(buf));
 //				line = new String(buf) + line;
 				if(line != null) {
-					System.out.println(">>>" + line);
-					line = URLDecoder.decode(line, "UTF-8");
+					//TODO need to change log method
+					System.out.println("Request From Client>>>" + line);
+					//line = URLDecoder.decode(line, "UTF-8");
 					request = new XRequest(line);
 				} else {
 					PLogging.printv(PLogging.DEBUG, "Invalid Request : Request Line is NULL..");
 					throw new Exception("Invalid HTTP Request ..");
 				}
 				
-				while((line = br.readLine()).length() > 0){
+				while((line = br.readLine()).length() > 0){	// 수정
+				//while((line = br.readLine()) != null && line.length() >= 0){	// 수정
 					request.addHeaderOption(line);
 				}
 				

@@ -11,8 +11,9 @@ public class ProtocolHelper {
 	public static final String ContentLength = "Content-Length";
 	
 	public static String getDefaultErrorHeader(String errorCode){
-		StringBuffer retStr = new StringBuffer("HTTP/1.1 " + errorCode + " OK\n");
+		StringBuffer retStr = new StringBuffer("HTTP/1.0 " + errorCode + " OK\n");
 		retStr.append("Connection: close\n");
+		//retStr.append("Connection: Keep-Alive\n");
 		retStr.append("Server : gonni server\n");
 		//retStr.append("Content-Type: " + mimetype + "\n");
 		retStr.append("\n");
@@ -21,8 +22,9 @@ public class ProtocolHelper {
 	}
 	
 	public static String getDefaultOKheader(String mimetype){
-		StringBuffer retStr = new StringBuffer("HTTP/1.1 200 OK\n");
+		StringBuffer retStr = new StringBuffer("HTTP/1.0 200 OK\n");
 		retStr.append("Connection: close\n");
+		//retStr.append("Connection: Keep-Alive\n");
 		retStr.append("Server : gonni server\n");
 		retStr.append("Content-Type: " + mimetype + "\n");
 		retStr.append("\n");
@@ -33,6 +35,7 @@ public class ProtocolHelper {
 	public static XResponse getDefaultXResponse(XResponse res){
 		
 		res.setAttribute("Connection", "close");
+		//res.setAttribute("Connection", "Keep-Alive");
 		res.setAttribute("Server", ValueServer);
 		res.setAttribute(ContentType, ValueContentTypeText);
 		
