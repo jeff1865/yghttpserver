@@ -39,15 +39,15 @@ public class ResourceDescription {
 		return resType;
 	}
 	
-	public void addOption(String name, String value) {
+	public void addParam(String name, String value) {
 		if(htResOptions == null)
 			this.htResOptions = new Hashtable<String, String>();
 		
 		this.htResOptions.put(name, value);
 	}
 	
-	public String getOption(String key){
-		if(this.htResOptions.containsKey(key)){
+	public String getParam(String key){
+		if(this.htResOptions != null && this.htResOptions.containsKey(key)){
 			return this.htResOptions.get(key);
 		}
 		return null;

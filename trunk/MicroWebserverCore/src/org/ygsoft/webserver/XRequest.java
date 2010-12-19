@@ -1,10 +1,13 @@
 package org.ygsoft.webserver;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.*;
 
 public class XRequest {
 	
 	private String strMain = null;
+//TODO need to change from Vector to Hashtable in order to improve speed
 	private Vector<String> strOptions = null;
 	private InputStream isBody = null;
 	private ResourceDescription resDesc = null;
@@ -67,7 +70,12 @@ public class XRequest {
 		// parse resouce part
 		String res = null;
 		if(stkz.hasMoreTokens()){
-			res = stkz.nextToken();
+			try {
+				res = URLDecoder.decode(stkz.nextToken(), "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
+			
 			if(res.indexOf("?") > 0){
 				this.resDesc.setResName(res.substring(1, res.indexOf("?")));
 				
@@ -76,9 +84,9 @@ public class XRequest {
 				while(st.hasMoreTokens()){
 					String opt = st.nextToken();	//?a=b&
 					if(opt.indexOf("=") > 0){
-						this.resDesc.addOption(opt.substring(0, opt.indexOf("=")), opt.substring(opt.indexOf("=")+1));
+						this.resDesc.addParam(opt.substring(0, opt.indexOf("=")), opt.substring(opt.indexOf("=")+1));
 					} else {
-						this.resDesc.addOption(opt, "~");
+						this.resDesc.addParam(opt, "~");
 					}
 				}
 			} else {
