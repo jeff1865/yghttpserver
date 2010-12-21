@@ -73,7 +73,7 @@ public class MicroWebServer extends Observable {
 	}
 	
 	protected void procClient(final Socket sock){
-		
+						
 		new Thread() { public void run(){
 			try {
 				sock.setSoTimeout(DefaultKeepAliveTime);
@@ -95,6 +95,4 @@ public class MicroWebServer extends Observable {
 			ss.executeService(srvCont);
 		}}.start();
 	}
-
-	
 }
